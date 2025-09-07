@@ -1,4 +1,5 @@
 from sqlmodel import  Session
+from bookstore.app.schema.book_schema import ProductCreate
 from models import Products
 from uuid import UUID, uuid4
 from repositories import book_repository
@@ -13,17 +14,17 @@ async def get_all_book(session: Session):
     list_book = await book_repository.get_all_book(session)
     return list_book
 
-async def create_book(book: Products, session: Session):
+async def create_book(book: ProductCreate, session: Session):
     book_data = await book_repository.create_book(book, session)
     return book_data
 
-async def update_book(book_id: UUID, book: Products, session: Session):
+async def update_book(book_id: UUID, book: ProductCreate, session: Session):
     book_update = await book_repository.update_book(book_id, book, session)
     if not book_update:
         return None
     return book_update
 
-async def delete_book(book_id: UUID, session: Sessions):
+async def delete_book(book_id: UUID, session: Session):
     book_delete = await book_repository.delete_book(book_id, session)
     if not book_delete:
         return {"status": "delete fail"}

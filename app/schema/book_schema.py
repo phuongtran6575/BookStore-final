@@ -20,7 +20,7 @@ class ProductBase(BaseModel):
     publication_date: Optional[date] = None
 
 
-class (ProductBase):
+class ProductCreate(ProductBase):
     pass  # giữ nguyên vì tất cả field đã có trong Base
 
 

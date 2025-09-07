@@ -1,6 +1,7 @@
+from uuid import UUID
 from fastapi import APIRouter
 from database.sqlite_database import sessionDepends
-from schema import book_schema
+from schema.book_schema import ProductCreate
 from models import Products
 from services import book_service
 router = APIRouter(prefix="/book", tags=["Book"])
@@ -11,7 +12,7 @@ async def get_all_book(session: sessionDepends):
     return list_book
 
 @router.get("/{book_id}")
-async def get_book_by_id(book_id: str, session: sessionDepends):
+async def get_book_by_id(book_id: UUID, session: sessionDepends):
     book = await book_service.get_book_by_id(book_id, session)
     return book
 
@@ -21,11 +22,11 @@ async def create_book(book: ProductCreate, session: sessionDepends):
     return book
 
 @router.put("/{book_id}")
-async def update_book(book_id: str, book: ProductCreate, session: sessionDepends):
+async def update_book(book_id: UUID, book: ProductCreate, session: sessionDepends):
     book = await book_service.update_book(book_id, book, session)
     return book
 
 @router.delete("/{book_id}")
-async def delete_book(book_id: str, session: sessionDepends):
+async def delete_book(book_id: UUID, session: sessionDepends):
     book = await book_service.delete_book(book_id, session)
     return {"status": "delete sucessful"}
