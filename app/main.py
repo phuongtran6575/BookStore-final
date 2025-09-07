@@ -11,4 +11,4 @@ async def root():
 
 app.include_router(auth_router)
 app.include_router(book_router)
-app.include_router(category_router)
+#app.include_router(category_router)
