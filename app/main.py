@@ -5,7 +5,7 @@ from controller.category_controller import router as category_router
 
 app = FastAPI()
 
-@app.get("/root")
+@app.get("/")
 async def root():
     return {"message": "hello API"}
 
