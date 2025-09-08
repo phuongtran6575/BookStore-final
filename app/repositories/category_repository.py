@@ -1,39 +1,45 @@
-from sqlmodel import  Session, select
+from sqlmodel import Session, select
+from uuid import UUID
 from models import Categories
-from uuid import UUID, uuid4
+from schema.category_schema import CategoryCreate, CategoryRead, CategoryUpdate
 
 
-async def get_category_by_id(category_id: UUID,session: Session):
-    statement = select(Categories).where(Categories.id == category_id)
-    category = session.exec(statement).first()
-    return category
-
-async def get_all_category(session: Session):
-    statement = select(Categories)
-    list_category = session.exec(statement).all()
-    return list_category
-
-async def create_category(category: Categories, session: Session):
-    category_data = Categories(
-        id = uuid4(),
-        name = category.name
-    )
-    session.add(category_data)
+def create_category(session: Session, category: CategoryCreate) -> CategoryRead:
+    db_category = Categories(**category.dict())
+    session.add(db_category)
     session.commit()
-    session.refresh(category_data)
-    return category_data
+    session.refresh(db_category)
+    return CategoryRead.from_orm(db_category)
 
-async def update_category(category_id: UUID, category: Categories ,session: Session):
-    statement = select(Categories).where(Categories.id == category_id)
-    category_update = session.exec(statement).first()
-    if category_update:
-        category_update.name = category.name
-    return category_update
 
-async def delete_category(category_id: UUID, session: Session):
+def get_category(session: Session, category_id: UUID) -> CategoryRead | None:
     statement = select(Categories).where(Categories.id == category_id)
-    category = session.exec(statement).first()
-    if category:
-        session.delete(category)
-        session.commit()
-    return {"message": "delete success"}
+    result = session.exec(statement).first()
+    return CategoryRead.from_orm(result) if result else None
+
+
+def list_categories(session: Session) -> list[CategoryRead]:
+    statement = select(Categories)
+    results = session.exec(statement).all()
+    return [CategoryRead.from_orm(c) for c in results]
+
+
+def update_category(session: Session, category_id: UUID, category: CategoryUpdate) -> CategoryRead | None:
+    db_category = session.get(Categories, category_id)
+    if not db_category:
+        return None
+    for key, value in category.dict(exclude_unset=True).items():
+        setattr(db_category, key, value)
+    session.add(db_category)
+    session.commit()
+    session.refresh(db_category)
+    return CategoryRead.from_orm(db_category)
+
+
+def delete_category(session: Session, category_id: UUID) -> bool:
+    db_category = session.get(Categories, category_id)
+    if not db_category:
+        return False
+    session.delete(db_category)
+    session.commit()
+    return True
