@@ -1,4 +1,4 @@
-from sqlmodel import  Session
+from sqlmodel import  Session, select
 from models import Categories
 from uuid import UUID, uuid4
 
@@ -20,7 +20,7 @@ async def create_category(category: Categories, session: Session):
     )
     session.add(category_data)
     session.commit()
-    sessin.refresh(category_data)
+    session.refresh(category_data)
     return category_data
 
 async def update_category(category_id: UUID, category: Categories ,session: Session):

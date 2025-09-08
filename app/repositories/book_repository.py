@@ -1,5 +1,5 @@
 from sqlmodel import  Session, select
-from bookstore.app.schema.book_schema import ProductCreate, ProductUpdate
+from schema.book_schema import ProductCreate, ProductUpdate
 from models import Products
 from uuid import UUID, uuid4
 
@@ -16,31 +16,20 @@ async def get_all_book(session: Session):
 async def update_book(book_id: UUID, book: ProductUpdate, session: Session):
     statement = select(Products).where(Products.id == book_id)
     book_update = session.exec(statement).first()
-    if book_update:
-        book_update.title = book.title
-        description: Optional[str] = None
-        price: Optional[float] = None
-        sale_price: Optional[float] = None
-        stock_quantity: Optional[int] = None
-        page_count: Optional[int] = None
-        cover_type: Optional[str] = None
-        publication_date: Optional[date] = None 
-        session.add(book_update)
-        session.commit()
+    if not book_update:
+        return None
+
+    update_data = book.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(book_update, key, value)
+
+    session.add(book_update)
+    session.commit()
+    session.refresh(book_update)
     return book_update
 
 async def create_book(book: ProductCreate, session: Session):
-    book_data = Products(
-        title= book.title,
-        description= book.description,
-        sku = book.sku,
-        price = book.price,
-        sale_price = book.sale_price,
-        stock_quantity= book.stock_quantity,
-        page_count = book.page_count,
-        cover_type = book.cover_type,
-        publication_date = book.publication_date
-    )
+    book_data = Products(**book.model_dump()) 
     session.add(book_data)
     session.commit()
     session.refresh(book_data)
@@ -49,8 +38,10 @@ async def create_book(book: ProductCreate, session: Session):
 async def delete_book(book_id: UUID, session: Session):
     statement = select(Products).where(Products.id == book_id)
     book = session.exec(statement).first()
-    if book:
-        session.delete(book)
-        session.commit()
+    if not book:
+        return None
+
+    session.delete(book)
+    session.commit()
     return {"status": "delete sucessful"}
 

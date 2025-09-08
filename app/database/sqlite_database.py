@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine, SQLModel
 from models import all_models
-engine = create_engine("sqlite:///./bookstore.db", echo=True)
+engine = create_engine("sqlite:///./bookstore.db")
 SQLModel.metadata.create_all(engine)
 def get_session():
     with Session(engine) as session:
