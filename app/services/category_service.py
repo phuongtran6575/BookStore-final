@@ -1,27 +1,28 @@
-from sqlmodel import Session, select
-from models import Categories
+
+
+
+from sqlmodel import Session
 from uuid import UUID
 from repositories import category_repository
+from schema.category_schema import CategoryCreate, CategoryRead, CategoryUpdate
 
 
-async def get_category_by_id(category_id: UUID, session: Session):
-    category = await category_repository.get_category_by_id(category_id, session)
-    return category
+def create_category_service(session: Session, category: CategoryCreate):
+    return category_repository.create_category(session, category)
 
-async def get_all_category(session: Session):
-    list_category = await category_repository.get_all_category(session)
-    return list_category
 
-async def create_category(category: Categories, session: Session):
-    category_create = await category_repository.create_category(category, session)
-    return category_create
+def get_category_by_id_service(session: Session, category_id: UUID):
+    return category_repository.get_category_by_id(session, category_id)
 
-async def update_category(category_id: UUID, category: Categories, session: Session):
-    category_update = await category_repository.update_category(category_id, category, session)
-    return category_update
 
-async def delete_category(category_id: UUID, session: Session):
-    category_delete = await category_repository.delete_category(category_id, session)
-    if not category_delete:
-        return {"status": "delete fail"}
-    return {"status": "delete sucessful"}
+def get_all_categories_service(session: Session) -> list[CategoryRead]:
+    return category_repository.get_all_categories(session)
+
+
+def update_category_service(session: Session, category_id: UUID, category: CategoryUpdate):
+    return category_repository.update_category(session, category_id, category)
+
+
+def delete_category_service(session: Session, category_id: UUID):
+    return category_repository.delete_category(session, category_id)
+
