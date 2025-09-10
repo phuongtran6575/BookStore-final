@@ -1,16 +1,16 @@
 from typing import Optional
 from uuid import UUID
-from sqlmodel import SQLModel
+from pydantic import BaseModel
 
 
-class CategoryBase(SQLModel):
+class CategoryBase(BaseModel):
     name: str
     slug: str
 
 class CategoryCreate(CategoryBase):
     parent_id: Optional[UUID] = None
 
-class CategoryUpdate(SQLModel):
+class CategoryUpdate(BaseModel):
     name: Optional[str] = None
     slug: Optional[str] = None
     parent_id: Optional[UUID] = None

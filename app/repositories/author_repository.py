@@ -2,44 +2,24 @@ from sqlmodel import Session, select
 from uuid import UUID
 from models import Authors
 from schema.author_schema import AuthorCreate, AuthorRead, AuthorUpdate
+from .base_repository import create_item, get_item_by_id, get_list_items, update_item_by_id, delete_item_by_id
 
 
-def create_author(session: Session, author: AuthorCreate) -> AuthorRead:
-    db_author = Authors(**author.dict())
-    session.add(db_author)
-    session.commit()
-    session.refresh(db_author)
-    return AuthorRead.from_orm(db_author)
+def create_author(session: Session, schema: AuthorCreate):
+    return create_item(session, Authors, schema)
 
 
-def get_author(session: Session, author_id: UUID) -> AuthorRead | None:
-    statement = select(Authors).where(Authors.id == author_id)
-    result = session.exec(statement).first()
-    return AuthorRead.from_orm(result) if result else None
+def get_author_by_id(session: Session, author_id: UUID):
+    return get_item_by_id(session, Authors, author_id)
 
 
-def list_authors(session: Session) -> list[AuthorRead]:
-    statement = select(Authors)
-    results = session.exec(statement).all()
-    return [AuthorRead.from_orm(author) for author in results]
+def get_list_authors(session: Session):
+    return get_list_items(session, Authors)
 
 
-def update_author(session: Session, author_id: UUID, author: AuthorUpdate) -> AuthorRead | None:
-    db_author = session.get(Authors, author_id)
-    if not db_author:
-        return None
-    for key, value in author.dict(exclude_unset=True).items():
-        setattr(db_author, key, value)
-    session.add(db_author)
-    session.commit()
-    session.refresh(db_author)
-    return AuthorRead.from_orm(db_author)
+def update_author(session: Session, author_id: UUID, schema: AuthorUpdate):
+    return update_item_by_id(session, Authors, author_id, schema)
 
 
-def delete_author(session: Session, author_id: UUID) -> bool:
-    db_author = session.get(Authors, author_id)
-    if not db_author:
-        return False
-    session.delete(db_author)
-    session.commit()
-    return True
+def delete_author(session: Session, author_id: UUID):
+    return delete_item_by_id(session, Authors, author_id)

@@ -1,9 +1,10 @@
 from typing import Optional
 from uuid import UUID
+from pydantic import BaseModel
 from sqlmodel import SQLModel
 
 
-class TagBase(SQLModel):
+class TagBase(BaseModel):
     name: str
     slug: str
 

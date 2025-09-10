@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from pydantic import EmailStr
-from sqlmodel import SQLModel, Field
+from pydantic import BaseModel, EmailStr
 
 
 # =========================
 # USER SCHEMAS
 # =========================
 
-class UserBase(SQLModel):
+class UserBase(BaseModel):
     full_name: Optional[str] = None
     email: EmailStr
 
@@ -26,7 +25,7 @@ class UserRead(UserBase):
     updated_at: datetime
 
 
-class UserUpdate(SQLModel):
+class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     phone_number: Optional[str] = None
     password_hash: Optional[str] = None
