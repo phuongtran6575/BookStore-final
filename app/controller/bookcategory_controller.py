@@ -39,6 +39,9 @@ async def remove_category_from_book(book_id: UUID | str, category_id: UUID | str
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
     bookcategories = await bookcategory_service.remove_category_from_book(book_uuid, category_uuid, session)
-    if not bookcategories:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return bookcategories
+    if  bookcategories is None:
+        raise HTTPException(status_code=404, detail="role not found")
+    return {
+        "status": "success",
+        "categories": bookcategories  # có thể rỗng []
+    }

@@ -39,6 +39,9 @@ async def remove_tag_from_book(book_id: UUID | str, tag_id: UUID | str, session:
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
     booktags = await booktag_service.remove_tag_from_book(book_uuid, tag_uuid, session)
-    if not booktags:
-        raise HTTPException(status_code=404, detail="Tag not found")
-    return booktags
+    if  booktags is None:
+        raise HTTPException(status_code=404, detail="role not found")
+    return {
+        "status": "success",
+        "tags": booktags  # có thể rỗng []
+    }

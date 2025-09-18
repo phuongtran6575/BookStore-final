@@ -29,14 +29,15 @@ async def remove_category_from_book(book_id: UUID, category_id: UUID, session: S
     ProductCategories.category_id == category.id
     )
     book_categories = session.exec(statement).first()
-    session.delete(book_categories)
-    session.commit()
+    if book_categories:
+        session.delete(book_categories)
+        session.commit()
     return {"message": f"Category {category_id} removed from book successfully"}
 
 async def get_book_categories(session: Session, book_id: UUID):
     statement = select(Categories).join(ProductCategories).where(ProductCategories.product_id == book_id)
     categories = session.exec(statement).all()
-    categories_name = []
+    results = []
     for category in categories:
-        categories_name.append(category.name)
-    return categories_name
+        results.append({"id": category.id, "name": category.name})
+    return results

@@ -29,14 +29,15 @@ async def remove_role_from_user(user_id: UUID, role_id: UUID, session: Session):
     UserRoles.role_id == role.id
     )
     user_roles =  session.exec(statement).first()
-    session.delete(user_roles)
-    session.commit()
+    if  user_roles:
+        session.delete(user_roles)
+        session.commit()
     return user.roles
 
 async def get_user_roles(session: Session, user_id: UUID):
     statement = select(Roles).join(UserRoles).where(UserRoles.user_id == user_id)
     roles = session.exec(statement).all()
-    roles_name = []
+    result = []   # dùng biến khác
     for role in roles:
-        roles_name.append(role.name)
-    return roles_name
+        result.append({"id": role.id, "name": role.name})
+    return result

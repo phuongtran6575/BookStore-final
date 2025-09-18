@@ -39,6 +39,9 @@ async def remove_role_from_user(user_id: UUID |str, role_id: UUID|str, session: 
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
     userroles = await userrole_service.remove_role_from_user(user_uuid, role_uuid, session)
-    if not userroles:
+    if  userroles is None:
         raise HTTPException(status_code=404, detail="role not found")
-    return userroles
+    return {
+        "status": "success",
+        "remaining_roles": userroles  # có thể rỗng []
+    }

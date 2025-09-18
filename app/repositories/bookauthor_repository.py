@@ -29,14 +29,15 @@ async def remove_author_from_book(book_id: UUID, author_id: UUID, session: Sessi
     ProductAuthors.author_id == author.id
     )
     book_authors = session.exec(statement).first()
-    session.delete(book_authors)
-    session.commit()
+    if book_authors: 
+        session.delete(book_authors)
+        session.commit()
     return {"message": f"Author {author_id} removed from book successfully"}
 
 async def get_book_authors(session: Session, book_id: UUID):
     statement = select(Authors).join(ProductAuthors).where(ProductAuthors.product_id == book_id)
     authors = session.exec(statement).all()
-    authors_name = []
+    results = []
     for author in authors:
-        authors_name.append(author.name)
-    return authors_name
+        results.append({"id": author.id, "name": author.name})
+    return results

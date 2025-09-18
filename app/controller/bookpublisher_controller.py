@@ -39,6 +39,9 @@ async def remove_publisher_from_book(book_id: UUID | str, publisher_id: UUID | s
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
     bookpublishers = await bookpublisher_service.remove_publisher_from_book(book_uuid, publisher_uuid, session)
-    if not bookpublishers:
-        raise HTTPException(status_code=404, detail="Publisher not found")
-    return bookpublishers
+    if  bookpublishers is None:
+        raise HTTPException(status_code=404, detail="role not found")
+    return {
+        "status": "success",
+        "publishers": bookpublishers  # có thể rỗng []
+    }

@@ -29,14 +29,15 @@ async def remove_tag_from_book(book_id: UUID, tag_id: UUID, session: Session):
     ProductTags.tag_id == tag.id
     )
     book_tags = session.exec(statement).first()
-    session.delete(book_tags)
-    session.commit()
+    if book_tags:
+        session.delete(book_tags)
+        session.commit()
     return {"message": f"Tag {tag_id} removed from book successfully"}
 
 async def get_book_tags(session: Session, book_id: UUID):
     statement = select(Tags).join(ProductTags).where(ProductTags.product_id == book_id)
     tags = session.exec(statement).all()
-    tags_name = []
+    results = []
     for tag in tags:
-        tags_name.append(tag.name)
-    return tags_name
+        results.append({"id": tag.id, "name": tag.name})
+    return results
