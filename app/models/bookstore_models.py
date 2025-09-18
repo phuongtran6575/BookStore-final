@@ -17,24 +17,24 @@ class Users(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    roles: List["UserRoles"] = Relationship(back_populates="user")
-    reviews: List["Reviews"] = Relationship(back_populates="user")
-    orders: List["Orders"] = Relationship(back_populates="user")
-    addresses: List["Addresses"] = Relationship(back_populates="user")
-    posts: List["Posts"] = Relationship(back_populates="user")
-    carts: List["Carts"] = Relationship(back_populates="user")
+    roles: List["UserRoles"] = Relationship(back_populates="user", cascade_delete=True)
+    reviews: List["Reviews"] = Relationship(back_populates="user", cascade_delete=True)
+    orders: List["Orders"] = Relationship(back_populates="user", cascade_delete=True)
+    addresses: List["Addresses"] = Relationship(back_populates="user", cascade_delete=True)
+    posts: List["Posts"] = Relationship(back_populates="user", cascade_delete=True)
+    carts: List["Carts"] = Relationship(back_populates="user", cascade_delete=True)
 
 
 class Roles(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     name: str = Field(unique=True)
 
-    users: List["UserRoles"] = Relationship(back_populates="role")
+    users: List["UserRoles"] = Relationship(back_populates="role", cascade_delete=True)
 
 
 class UserRoles(SQLModel, table=True):
-    user_id: UUID = Field(foreign_key="users.id", primary_key=True)
-    role_id: UUID = Field(foreign_key="roles.id", primary_key=True)
+    user_id: UUID = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
+    role_id: UUID = Field(foreign_key="roles.id", primary_key=True, ondelete="CASCADE")
 
     user: Optional[Users] = Relationship(back_populates="roles")
     role: Optional[Roles] = Relationship(back_populates="users")
@@ -49,7 +49,7 @@ class Authors(SQLModel, table=True):
     name: str = Field(unique=True)
     bio: Optional[str] = None
 
-    products: List["ProductAuthors"] = Relationship(back_populates="author")
+    products: List["ProductAuthors"] = Relationship(back_populates="author", cascade_delete=True)
 
 
 class Publishers(SQLModel, table=True):
@@ -57,7 +57,7 @@ class Publishers(SQLModel, table=True):
     name: str = Field(unique=True)
     address: Optional[str] = None
 
-    products: List["ProductPublishers"] = Relationship(back_populates="publisher")
+    products: List["ProductPublishers"] = Relationship(back_populates="publisher", cascade_delete=True)
 
 
 class Categories(SQLModel, table=True):
@@ -66,7 +66,7 @@ class Categories(SQLModel, table=True):
     slug: str = Field(unique=True, index=True)
     parent_id: Optional[UUID] = Field(default=None, foreign_key="categories.id")
 
-    products: List["ProductCategories"] = Relationship(back_populates="category")
+    products: List["ProductCategories"] = Relationship(back_populates="category", cascade_delete=True)
 
 
 class Tags(SQLModel, table=True):
@@ -74,7 +74,7 @@ class Tags(SQLModel, table=True):
     name: str
     slug: str = Field(unique=True, index=True)
 
-    products: List["ProductTags"] = Relationship(back_populates="tag")
+    products: List["ProductTags"] = Relationship(back_populates="tag", cascade_delete=True)
 
 
 # =========================
@@ -95,28 +95,28 @@ class Products(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    authors: List["ProductAuthors"] = Relationship(back_populates="product")
-    publishers: List["ProductPublishers"] = Relationship(back_populates="product")
-    categories: List["ProductCategories"] = Relationship(back_populates="product")
-    tags: List["ProductTags"] = Relationship(back_populates="product")
-    images: List["ProductImages"] = Relationship(back_populates="product")
-    reviews: List["Reviews"] = Relationship(back_populates="product")
-    order_items: List["OrderItems"] = Relationship(back_populates="product")
-    cart_items: List["CartItems"] = Relationship(back_populates="product")
-    inventory_logs: List["InventoryLog"] = Relationship(back_populates="product")
+    authors: List["ProductAuthors"] = Relationship(back_populates="product", cascade_delete=True)
+    publishers: List["ProductPublishers"] = Relationship(back_populates="product", cascade_delete=True)
+    categories: List["ProductCategories"] = Relationship(back_populates="product",cascade_delete=True)
+    tags: List["ProductTags"] = Relationship(back_populates="product", cascade_delete=True)
+    images: List["ProductImages"] = Relationship(back_populates="product", cascade_delete=True)
+    reviews: List["Reviews"] = Relationship(back_populates="product", cascade_delete=True)
+    order_items: List["OrderItems"] = Relationship(back_populates="product", cascade_delete=True)
+    cart_items: List["CartItems"] = Relationship(back_populates="product",cascade_delete=True)
+    inventory_logs: List["InventoryLog"] = Relationship(back_populates="product",cascade_delete=True)
 
 
 class ProductAuthors(SQLModel, table=True):
-    product_id: UUID = Field(foreign_key="products.id", primary_key=True)
-    author_id: UUID = Field(foreign_key="authors.id", primary_key=True)
+    product_id: UUID = Field(foreign_key="products.id", primary_key=True, ondelete="CASCADE")
+    author_id: UUID = Field(foreign_key="authors.id", primary_key=True, ondelete="CASCADE")
 
     product: Optional[Products] = Relationship(back_populates="authors")
     author: Optional[Authors] = Relationship(back_populates="products")
 
 
 class ProductPublishers(SQLModel, table=True):
-    product_id: UUID = Field(foreign_key="products.id", primary_key=True)
-    publisher_id: UUID = Field(foreign_key="publishers.id", primary_key=True)
+    product_id: UUID = Field(foreign_key="products.id", primary_key=True, ondelete="CASCADE")
+    publisher_id: UUID = Field(foreign_key="publishers.id", primary_key=True, ondelete="CASCADE")
     edition: Optional[str] = None
     year: Optional[int] = None
     isbn: Optional[str] = None
@@ -126,16 +126,16 @@ class ProductPublishers(SQLModel, table=True):
 
 
 class ProductCategories(SQLModel, table=True):
-    product_id: UUID = Field(foreign_key="products.id", primary_key=True)
-    category_id: UUID = Field(foreign_key="categories.id", primary_key=True)
+    product_id: UUID = Field(foreign_key="products.id", primary_key=True, ondelete="CASCADE")
+    category_id: UUID = Field(foreign_key="categories.id", primary_key=True, ondelete="CASCADE")
 
     product: Optional[Products] = Relationship(back_populates="categories")
     category: Optional[Categories] = Relationship(back_populates="products")
 
 
 class ProductTags(SQLModel, table=True):
-    product_id: UUID = Field(foreign_key="products.id", primary_key=True)
-    tag_id: UUID = Field(foreign_key="tags.id", primary_key=True)
+    product_id: UUID = Field(foreign_key="products.id", primary_key=True, ondelete="CASCADE")
+    tag_id: UUID = Field(foreign_key="tags.id", primary_key=True, ondelete="CASCADE")
 
     product: Optional[Products] = Relationship(back_populates="tags")
     tag: Optional[Tags] = Relationship(back_populates="products")
@@ -143,7 +143,7 @@ class ProductTags(SQLModel, table=True):
 
 class ProductImages(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    product_id: UUID = Field(foreign_key="products.id")
+    product_id: UUID = Field(foreign_key="products.id", ondelete="CASCADE")
     image_url: str
     is_thumbnail: bool = Field(default=False)
 
@@ -152,7 +152,7 @@ class ProductImages(SQLModel, table=True):
 
 class InventoryLog(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    product_id: UUID = Field(foreign_key="products.id")
+    product_id: UUID = Field(foreign_key="products.id", ondelete="CASCADE")
     change_type: str  # import, export, adjust
     quantity_change: int
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -167,8 +167,8 @@ class InventoryLog(SQLModel, table=True):
 
 class Reviews(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    product_id: UUID = Field(foreign_key="products.id")
-    user_id: UUID = Field(foreign_key="users.id")
+    product_id: UUID = Field(foreign_key="products.id", ondelete="CASCADE")
+    user_id: UUID = Field(foreign_key="users.id", ondelete="CASCADE")
     rating: int
     comment: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -183,7 +183,7 @@ class Reviews(SQLModel, table=True):
 
 class Orders(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    user_id: Optional[UUID] = Field(default=None, foreign_key="users.id")
+    user_id: Optional[UUID] = Field(default=None, foreign_key="users.id", ondelete="CASCADE")
     customer_name: str
     customer_email: str
     customer_phone: str
@@ -201,8 +201,8 @@ class Orders(SQLModel, table=True):
 
 class OrderItems(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    order_id: UUID = Field(foreign_key="orders.id")
-    product_id: UUID = Field(foreign_key="products.id")
+    order_id: UUID = Field(foreign_key="orders.id", ondelete="CASCADE")
+    product_id: UUID = Field(foreign_key="products.id", ondelete="CASCADE")
     quantity: int
     price: float  # snapshot price
     subtotal: float
@@ -213,7 +213,7 @@ class OrderItems(SQLModel, table=True):
 
 class Payments(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    order_id: UUID = Field(foreign_key="orders.id")
+    order_id: UUID = Field(foreign_key="orders.id", ondelete="CASCADE")
     transaction_id: Optional[str] = None
     amount: float
     status: str  # pending, paid, failed, refunded
@@ -229,7 +229,7 @@ class Payments(SQLModel, table=True):
 
 class Addresses(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    user_id: UUID = Field(foreign_key="users.id")
+    user_id: UUID = Field(foreign_key="users.id", ondelete="CASCADE")
     full_address: str
     is_default: bool = Field(default=False)
 
@@ -255,9 +255,9 @@ class Vouchers(SQLModel, table=True):
 
 
 class VoucherUsage(SQLModel, table=True):
-    voucher_id: UUID = Field(foreign_key="vouchers.id", primary_key=True)
-    user_id: UUID = Field(foreign_key="users.id", primary_key=True)
-    order_id: UUID = Field(foreign_key="orders.id")
+    voucher_id: UUID = Field(foreign_key="vouchers.id", primary_key=True, ondelete="CASCADE")
+    user_id: UUID = Field(foreign_key="users.id", primary_key=True, ondelete="CASCADE")
+    order_id: UUID = Field(foreign_key="orders.id", ondelete="CASCADE")
     used_at: datetime = Field(default_factory=datetime.utcnow)
 
     voucher: Optional[Vouchers] = Relationship(back_populates="usage")

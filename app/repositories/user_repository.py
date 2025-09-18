@@ -22,14 +22,14 @@ async def create_user(user: UserCreate, session: Session):
     session.add(user_data)
     session.commit()
     session.refresh(user_data)
-    return user
+    return user_data
 
 async def get_all_user(session: Session):
     statement = select(Users)
     list_users = session.exec(statement).all()
     return list_users
 
-async def update_book(user_id: UUID, user: UserUpdate, session: Session):
+async def update_user(user_id: UUID, user: UserUpdate, session: Session):
     statement = select(Users).where(Users.id == user_id)
     user_update = session.exec(statement).first()
     if not user_update:
@@ -44,7 +44,7 @@ async def update_book(user_id: UUID, user: UserUpdate, session: Session):
     session.refresh(user_update)
     return user_update
 
-async def delete_book(user_id: UUID, session: Session):
+async def delete_user(user_id: UUID, session: Session):
     statement = select(Users).where(Users.id == user_id)
     user = session.exec(statement).first()
     if not user:

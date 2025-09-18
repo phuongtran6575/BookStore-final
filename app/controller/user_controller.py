@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from uuid import UUID
+from services import auth_service
 from core.helper import to_uuid
-from schema.user_schema import UserCreate, UserUpdate
+from schema.user_schema import UserCreate, UserRead, UserUpdate
 from services import user_service
 from database.sqlite_database import sessionDepends
 
@@ -27,9 +28,9 @@ async def get_user_by_id(user_id: UUID | str, session: sessionDepends):
     return user
 
 # ================= CREATE =================
-@router.post("/")
+@router.post("/", response_model=UserRead)
 async def create_user(user: UserCreate, session: sessionDepends):
-    created_user = await user_service.create_user(user, session)
+    created_user = await auth_service.registered(user, session)
     return created_user
 
 # ================= UPDATE =================

@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter
 from core.helper import to_uuid
 from database.sqlite_database import sessionDepends
-from schema.book_schema import ProductCreate, ProductUpdate
+from schema.book_schema import ProductBase, ProductCreate, ProductRead, ProductUpdate
 from services import book_service
 from fastapi import APIRouter, HTTPException
 from uuid import UUID

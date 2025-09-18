@@ -4,7 +4,8 @@ from uuid import UUID
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 import jwt
-from sqlmodel import Session
+from sqlmodel import Session, select
+from models.bookstore_models import Roles, UserRoles
 from core.constants import ALGORITHM, SECRET_KEY
 from schema.user_schema import UserCreate
 from repositories import user_repository
@@ -37,6 +38,14 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+async def get_user_roles(session: Session, user_id: UUID):
+    statement = select(Roles).join(UserRoles).where(UserRoles.user_id == user_id)
+    roles = session.exec(statement).all()
+    roles_name = []
+    for role in roles:
+        roles_name.append(role.name)
+    return roles_name
+
 async def get_user(email: str, session: Session):
     return await user_repository.get_user_by_email(email, session)
 
@@ -52,7 +61,17 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
     user = await user_repository.get_user_by_id(user_uuid, session)
     if user is None:
         raise ValueError("Not found")
-    return user
+    return {
+            "id": str(user.id),
+            "email": user.email,
+            "roles": get_user_roles(session, user.id)
+    }
 
 async def registered(user: UserCreate, session: Session):
-    return await user_repository.create_user(user, session)
+    user_create = UserCreate(
+        full_name= user.full_name,
+        email=user.email,
+        password_hash= await get_hashed_password(user.password_hash),
+        phone_number= user.phone_number)
+    
+    return await user_repository.create_user(user_create, session)

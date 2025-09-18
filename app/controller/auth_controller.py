@@ -33,12 +33,13 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    roles = await auth_service.get_user_roles(session, user.id)
     access_token = auth_service.create_access_token(
-        data={"sub": str(user.id)}, expires_delta=access_token_expires
+        data={"sub": str(user.id), "roles": roles}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("register")
 async def register(user: UserCreate,session: sessionDepends):
-    created_user = await user_service.create_user(user, session)
+    created_user = await auth_service.registered(user, session)
     return created_user
