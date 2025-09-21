@@ -24,7 +24,7 @@ async def verify_password(plain_password: str, hashed_password: str):
 
 async def authentication_user(email: str, password:str, session: Session):
     user = await get_user(email, session)
-    if not user or not verify_password(password, user.password_hash):
+    if not user or not await verify_password(password, user.password_hash):
         return None
     return user
 
@@ -62,9 +62,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
     if user is None:
         raise ValueError("Not found")
     return {
-            "id": str(user.id),
-            "email": user.email,
-            "roles": get_user_roles(session, user.id)
+            "user": user,
+            "roles": await get_user_roles(session, user.id)
     }
 
 async def registered(user: UserCreate, session: Session):

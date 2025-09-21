@@ -12,7 +12,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 router = APIRouter(prefix="/auth", tags=["Auth"])
 token = auth_service.oauth2_scheme
 
-@router.get("/read_me", response_model=UserRead)
+@router.get("/read_me")
 async def read_me( token: Annotated[str, Depends(token)],session: sessionDepends):
     current_user = await auth_service.get_current_user(token, session)
     if not current_user:
@@ -39,7 +39,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.post("register")
+@router.post("/register")
 async def register(user: UserCreate,session: sessionDepends):
     created_user = await auth_service.registered(user, session)
     return created_user
