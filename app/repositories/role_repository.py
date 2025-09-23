@@ -5,6 +5,10 @@ from models.bookstore_models import Roles
 
 from .base_repository import create_item, get_item_by_id, get_list_items, update_item_by_id, delete_item_by_id
 
+async def get_role_by_name(session:Session, role_name:str):
+    statement = select(Roles).where(Roles.name == role_name)
+    result = session.exec(statement).first()
+    return result
 
 def create_role(session: Session, schema: RoleCreate):
     return create_item(session, Roles, schema)

@@ -5,9 +5,10 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from sqlmodel import Session, select
-from models.bookstore_models import Roles, UserRoles
+from repositories import role_repository
+from models.bookstore_models import Roles, UserRoles, Users
 from core.constants import ALGORITHM, SECRET_KEY
-from schema.user_schema import UserCreate
+from schema.user_schema import UserCreate, UserRead
 from repositories import user_repository
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -62,15 +63,27 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
     if user is None:
         raise ValueError("Not found")
     return {
-            "user": user,
+            "user": UserRead(
+                full_name = user.full_name,
+                email = user.email,
+                id = user.id,
+                phone_number = user.phone_number,
+                created_at = user.created_at,
+                updated_at = user.updated_at
+                ),
             "roles": await get_user_roles(session, user.id)
     }
 
-async def registered(user: UserCreate, session: Session):
-    user_create = UserCreate(
+async def registered(user: Users, session: Session):
+    user_create = Users(
         full_name= user.full_name,
         email=user.email,
         password_hash= await get_hashed_password(user.password_hash),
         phone_number= user.phone_number)
+    role = await role_repository.get_role_by_name(session, "user")
+    if role is None:
+        raise ValueError("Not Found")
     
+    session.add(UserRoles(user_id=user_create.id, role_id=role.id))
+    session.commit()    
     return await user_repository.create_user(user_create, session)

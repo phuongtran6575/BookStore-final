@@ -11,6 +11,7 @@ from controller.bookcategory_controller import router as bookcategory_router
 from controller.bookauthor_controller import router as bookauthor_router
 from controller.bookpublisher_controller import router as bookpublisher_router
 from controller.booktag_controller import router as booktag_router
+from controller.useraddress_controller import router as useraddress_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -44,3 +45,4 @@ app.include_router(bookcategory_router)
 app.include_router(bookauthor_router)
 app.include_router(bookpublisher_router)
 app.include_router(booktag_router)
+app.include_router(useraddress_router)

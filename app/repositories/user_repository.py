@@ -17,7 +17,7 @@ async def get_user_by_email(email: str, session: Session):
         return None
     return user
 
-async def create_user(user: UserCreate, session: Session):
+async def create_user(user: Users, session: Session):
     user_data = Users(**user.model_dump()) 
     session.add(user_data)
     session.commit()
