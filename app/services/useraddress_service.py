@@ -2,11 +2,13 @@ from uuid import UUID
 
 from sqlmodel import Session
 
+from models.bookstore_models import Addresses
 from repositories import useraddress_repository
+from schema.user_schema import AddressCreate
 
 
-async def add_address_to_user(session: Session, user_id: UUID, full_address: str, is_default: bool ):
-    return await useraddress_repository.add_address_to_user(session, user_id, full_address, is_default)
+async def add_address_to_user(session: Session, address: AddressCreate ):
+    return await useraddress_repository.add_address_to_user(session, address)
 
 async def remove_address_from_user(session: Session, address_id: UUID):
     return await useraddress_repository.remove_address_from_user(session, address_id)

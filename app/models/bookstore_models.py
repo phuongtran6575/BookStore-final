@@ -230,6 +230,8 @@ class Payments(SQLModel, table=True):
 class Addresses(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     user_id: UUID = Field(foreign_key="users.id", ondelete="CASCADE")
+    phone_number: str
+    full_name:str
     full_address: str
     is_default: bool = Field(default=False)
 

@@ -74,7 +74,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
             "roles": await get_user_roles(session, user.id)
     }
 
-async def registered(user: Users, session: Session):
+async def registered(user: UserCreate, session: Session):
     user_create = Users(
         full_name= user.full_name,
         email=user.email,

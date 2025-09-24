@@ -2,17 +2,16 @@ from uuid import UUID
 from sqlmodel import Session, select
 
 from models.bookstore_models import Addresses
+from schema.user_schema import AddressCreate
 
 
-async def add_address_to_user(session: Session, user_id: UUID, full_address: str, is_default: bool):
-    address = Addresses(
-        user_id=user_id,
-        full_address=full_address,
-        is_default=is_default
-    )
-    session.add(address)
+
+
+async def add_address_to_user(session: Session, address: AddressCreate):
+    address_create = Addresses(**address.model_dump())
+    session.add(address_create)
     session.commit()
-    session.refresh(address)
+    session.refresh(address_create)
     return address
 
 

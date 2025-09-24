@@ -15,8 +15,7 @@ async def get_user_by_id(user_id: UUID, session: Session):
 async def get_all_users(session: Session):
     return await user_repository.get_all_user(session)
 
-async def create_user(user: UserCreate, session: Session):
-    return await user_repository.create_user(user, session)
+
 
 async def update_user(user_id: UUID, user: UserUpdate, session: Session):
     return await user_repository.update_user(user_id, user, session)

@@ -9,7 +9,7 @@ from pydantic import UUID4, BaseModel, EmailStr
 # =========================
 
 class UserBase(BaseModel):
-    full_name: Optional[str] = None
+    full_name: str
     email: EmailStr
 
 
@@ -34,3 +34,12 @@ class UserUpdate(BaseModel):
 class UserRoleCreate(BaseModel):
     user_id: UUID4 | str
     role_id: UUID4 | str
+
+
+class AddressCreate(BaseModel):
+    user_id: UUID
+    phone_number:str
+    full_name: str
+    full_address:str
+    is_default:bool
+    

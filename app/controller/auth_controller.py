@@ -40,6 +40,6 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sess
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/register", response_model=UserCreate)
-async def register(user: Users,session: sessionDepends):
+async def register(user: UserCreate,session: sessionDepends):
     created_user = await auth_service.registered(user, session)
     return created_user

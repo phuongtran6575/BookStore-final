@@ -1,6 +1,6 @@
 from sqlmodel import Session, select
 from uuid import UUID
-from models import Authors
+from models.bookstore_models import Authors
 from schema.author_schema import AuthorCreate, AuthorRead, AuthorUpdate
 from .base_repository import create_item, get_item_by_id, get_list_items, update_item_by_id, delete_item_by_id
 
