@@ -7,7 +7,7 @@ from schema.user_schema import AddressCreate
 
 
 
-async def add_address_to_user(session: Session, address: AddressCreate):
+async def add_address_to_user(session: Session, address: Addresses):
     address_create = Addresses(**address.model_dump())
     session.add(address_create)
     session.commit()
@@ -29,3 +29,11 @@ async def get_user_addresses(session: Session, user_id: UUID):
     statement = select(Addresses).where(Addresses.user_id == user_id)
     results = session.exec(statement).all()
     return results
+
+
+async def get_address_by_id(session: Session, address_id: UUID):
+    statement = select(Addresses).where(Addresses.id == address_id)
+    result = session.exec(statement).first()
+    if not result:
+        raise ValueError("Not Found")
+    return result

@@ -50,7 +50,20 @@ async def get_user_roles(session: Session, user_id: UUID):
 async def get_user(email: str, session: Session):
     return await user_repository.get_user_by_email(email, session)
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: Session):    
+async def read_me(token: str, session:Session):
+    user = await get_current_user(token, session)
+    return {
+        "user": UserRead(
+                full_name = user.full_name,
+                email = user.email,
+                phone_number = user.phone_number,
+                created_at = user.created_at,
+                updated_at = user.updated_at
+                ),
+        "roles": await get_user_roles(session, user.id),
+    }
+
+async def get_current_user(token: str, session: Session):    
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     user_id = payload.get("sub")
     if user_id is None:
@@ -62,17 +75,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
     user = await user_repository.get_user_by_id(user_uuid, session)
     if user is None:
         raise ValueError("Not found")
-    return {
-            "user": UserRead(
-                full_name = user.full_name,
-                email = user.email,
-                id = user.id,
-                phone_number = user.phone_number,
-                created_at = user.created_at,
-                updated_at = user.updated_at
-                ),
-            "roles": await get_user_roles(session, user.id)
-    }
+    return user
 
 async def registered(user: UserCreate, session: Session):
     user_create = Users(

@@ -19,7 +19,6 @@ class UserCreate(UserBase):
 
 
 class UserRead(UserBase):
-    id: UUID
     phone_number: Optional[str] = None
     created_at: datetime
     updated_at: datetime
@@ -37,7 +36,6 @@ class UserRoleCreate(BaseModel):
 
 
 class AddressCreate(BaseModel):
-    user_id: UUID
     phone_number:str
     full_name: str
     full_address:str
