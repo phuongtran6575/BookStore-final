@@ -9,9 +9,9 @@ router = APIRouter(prefix="/bookcategories", tags=["BookCategories"])
 
 
 @router.get("/")
-async def get_book_categories(book_id: UUID | str, session: sessionDepends):
+async def get_book_categories(product_id: UUID | str, session: sessionDepends):
     try:
-        book_uuid = to_uuid(book_id)
+        book_uuid = to_uuid(product_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
 
@@ -31,10 +31,10 @@ async def add_category_to_book(bookcategory: ProductCategories, session: session
     return bookcategories
 
 
-@router.delete("/{book_id}/{category_id}")
-async def remove_category_from_book(book_id: UUID | str, category_id: UUID | str, session: sessionDepends):
+@router.delete("/{product_id}/{category_id}")
+async def remove_category_from_book(product_id: UUID | str, category_id: UUID | str, session: sessionDepends):
     try:
-        book_uuid = to_uuid(book_id)
+        book_uuid = to_uuid(product_id)
         category_uuid = to_uuid(category_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")

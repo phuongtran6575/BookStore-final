@@ -37,3 +37,18 @@ async def get_address_by_id(session: Session, address_id: UUID):
     if not result:
         raise ValueError("Not Found")
     return result
+
+async def update_address(address_id: UUID, address: AddressCreate, session: Session):
+    statement = select(Addresses).where(Addresses.id == address_id)
+    address_update = session.exec(statement).first()
+    if not address_update:
+        return None
+
+    update_data = address.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(address_update, key, value)
+
+    session.add(address_update)
+    session.commit()
+    session.refresh(address_update)
+    return address_update

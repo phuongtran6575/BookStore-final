@@ -24,3 +24,6 @@ async def get_addresses_user(session: Session, user_id:UUID):
 
 async def get_address_by_id(session: Session, address_id: UUID):
     return await useraddress_repository.get_address_by_id(session, address_id)
+
+async def update_address(session: Session, address_id: UUID, address: AddressCreate ):
+    return await useraddress_repository.update_address(address_id, address, session)

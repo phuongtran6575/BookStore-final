@@ -39,14 +39,15 @@ async def add_address_to_user(token: Annotated[str, Depends(token)],session: ses
 async def remove_address_from_user(token: Annotated[str, Depends(token)],  session: sessionDepends, address_id: UUID):
     user = await auth_service.get_current_user(token, session)
     
-    address = await  useraddress_service.get_address_by_id(session, address_id)
-    if not address:
-        raise HTTPException(status_code=404, detail="Address not found")
-    
     try:
         address_uuid = to_uuid(address_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
+    
+    address = await  useraddress_service.get_address_by_id(session, address_uuid)
+    if not address:
+        raise HTTPException(status_code=404, detail="Address not found")
+    
     
     if user.id != address.user_id:
         raise HTTPException(status_code=403, detail="Not authorized to delete this address")
@@ -56,3 +57,24 @@ async def remove_address_from_user(token: Annotated[str, Depends(token)],  sessi
         return HTTPException(status_code=404, detail="Address not found")
     
     return address_delete
+
+@router.put("/{}")
+async def update_address(token: Annotated[str, Depends(token)],address_id: UUID, session: sessionDepends, address: AddressCreate):
+    user = await auth_service.get_current_user(token, session)
+    try:
+        address_uuid = to_uuid(address_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid UUID format")
+    
+    address_check = await  useraddress_service.get_address_by_id(session, address_uuid)
+    if not address:
+        raise HTTPException(status_code=404, detail="Address not found")
+    
+    if user.id != address_check.user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this address")
+    
+    address_update = await useraddress_service.update_address(session, address_uuid, address)
+    if not address_update:
+        return HTTPException(status_code=404, detail="Address not found")
+    
+    return address_update
