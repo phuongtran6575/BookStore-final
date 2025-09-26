@@ -12,8 +12,8 @@ def get_category_by_id_service(session: Session, category_id: UUID):
     return category_repository.get_category_by_id(session, category_id)
 
 
-def get_all_categories_service(session: Session):
-    return category_repository.get_list_categories(session)
+async def get_all_categories_service(session: Session):
+    return await category_repository.get_list_categories(session)
 
 
 def update_category_service(session: Session, category_id: UUID, category: CategoryUpdate):

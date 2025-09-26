@@ -67,6 +67,11 @@ class Categories(SQLModel, table=True):
     parent_id: Optional[UUID] = Field(default=None, foreign_key="categories.id")
 
     products: List["ProductCategories"] = Relationship(back_populates="category", cascade_delete=True)
+    parent: Optional["Categories"] = Relationship(
+        back_populates="children",
+        sa_relationship_kwargs={"remote_side": "Categories.id"},
+    )
+    children: List["Categories"] = Relationship(back_populates="parent")
 
 
 class Tags(SQLModel, table=True):
@@ -86,6 +91,7 @@ class Products(SQLModel, table=True):
     title: str
     description: Optional[str] = None
     sku: str = Field(unique=True, index=True)
+    ISBN: str = Field(unique=True, index=True)
     price: float
     sale_price: Optional[float] = None
     stock_quantity: int = Field(default=0)

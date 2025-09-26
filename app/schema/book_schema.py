@@ -14,6 +14,7 @@ class ProductBase(BaseModel):
     sku: str
     price: float
     sale_price: Optional[float] = None
+    ISBN: str
     stock_quantity: int = 0
     page_count: Optional[int] = None
     cover_type: Optional[str] = None

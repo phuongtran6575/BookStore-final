@@ -3,7 +3,7 @@ from uuid import UUID
 from services import category_service
 from schema.category_schema import CategoryCreate, CategoryUpdate
 from database.sqlite_database import sessionDepends
-from core.helper import to_uuid
+from core.helper import to_category_read, to_uuid
 
 router = APIRouter(prefix="/categories", tags=["Categories"])
 
@@ -23,7 +23,7 @@ async def get_category_by_id(category_id: UUID | str, session: sessionDepends):
     category = await category_service.get_category_by_id_service(session, category_uuid)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    return category
+    return to_category_read(category)
 
 
 @router.post("/")

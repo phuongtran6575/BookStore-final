@@ -4,6 +4,7 @@ from controller.book_controller import router as book_router
 from controller.category_controller import router as category_router
 from controller.publisher_controller import router as publisher_router
 from controller.author_controller import router as author_router
+from controller.tag_controller import router as tag_router
 from controller.role_controller import router as role_router
 from controller.userrole_controller import router as userrole_router
 from controller.user_controller import router as user_router
@@ -46,3 +47,4 @@ app.include_router(bookauthor_router)
 app.include_router(bookpublisher_router)
 app.include_router(booktag_router)
 app.include_router(useraddress_router)
+app.include_router(tag_router)

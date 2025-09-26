@@ -17,4 +17,4 @@ class CategoryUpdate(BaseModel):
 
 class CategoryRead(CategoryBase):
     id: UUID
-    parent_id: Optional[UUID] = None
+    parentName: Optional[str] = None
