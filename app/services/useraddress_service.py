@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlmodel import Session
+from sqlmodel import Session, select, update
 
 from models.bookstore_models import Addresses
 from repositories import useraddress_repository
@@ -27,3 +27,20 @@ async def get_address_by_id(session: Session, address_id: UUID):
 
 async def update_address(session: Session, address_id: UUID, address: AddressCreate ):
     return await useraddress_repository.update_address(address_id, address, session)
+
+async def set_default_address(address_id: UUID, session: Session ):
+    address = await useraddress_repository.get_address_by_id(session, address_id)
+    if not address:
+        raise ValueError("Not  Found")
+    
+    statement = select(Addresses).where(Addresses.user_id == address.user_id)
+    list_addresses = session.exec(statement)
+    for record in list_addresses:
+        record.is_default = False
+
+    # Set địa chỉ này thành true
+    address.is_default = True
+    session.add(address)
+    session.commit()
+    session.refresh(address)
+    return address

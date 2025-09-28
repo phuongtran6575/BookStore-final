@@ -40,3 +40,8 @@ class ProductUpdate(BaseModel):
     page_count: Optional[int] = None
     cover_type: Optional[str] = None
     publication_date: Optional[date] = None
+    
+    
+class BookImageCreate(BaseModel):
+    image_url: str
+    book_id: UUID

@@ -56,6 +56,7 @@ async def read_me(token: str, session:Session):
         "user": UserRead(
                 full_name = user.full_name,
                 email = user.email,
+                id = user.id,
                 phone_number = user.phone_number,
                 created_at = user.created_at,
                 updated_at = user.updated_at

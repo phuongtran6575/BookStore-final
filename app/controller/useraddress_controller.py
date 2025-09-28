@@ -58,7 +58,7 @@ async def remove_address_from_user(token: Annotated[str, Depends(token)],  sessi
     
     return address_delete
 
-@router.put("/{}")
+@router.put("/{address_id}")
 async def update_address(token: Annotated[str, Depends(token)],address_id: UUID, session: sessionDepends, address: AddressCreate):
     user = await auth_service.get_current_user(token, session)
     try:
@@ -78,3 +78,15 @@ async def update_address(token: Annotated[str, Depends(token)],address_id: UUID,
         return HTTPException(status_code=404, detail="Address not found")
     
     return address_update
+
+
+@router.put("/{address_id}/set-default")
+async def set_default_address(address_id: UUID, session: sessionDepends):
+    try:
+        address_uuid = to_uuid(address_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid UUID format")
+    address = await useraddress_service.set_default_address(address_uuid, session)
+    if not address:
+        raise HTTPException(status_code=404, detail="address not found")
+    return  address

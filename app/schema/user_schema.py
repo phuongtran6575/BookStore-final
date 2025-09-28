@@ -20,6 +20,7 @@ class UserCreate(UserBase):
 
 class UserRead(UserBase):
     phone_number: Optional[str] = None
+    id: UUID
     created_at: datetime
     updated_at: datetime
 
