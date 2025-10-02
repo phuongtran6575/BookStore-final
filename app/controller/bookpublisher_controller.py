@@ -1,5 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, HTTPException
+from schema.publisher_schema import ProductPublisherCreate
 from models.bookstore_models import ProductPublishers
 from services import bookpublisher_service
 from core.helper import to_uuid
@@ -8,7 +9,7 @@ from database.sqlite_database import sessionDepends
 router = APIRouter(prefix="/bookpublishers", tags=["BookPublishers"])
 
 
-@router.get("/")
+@router.get("/{product_id}")
 async def get_book_publishers(product_id: UUID | str, session: sessionDepends):
     try:
         book_uuid = to_uuid(product_id)
@@ -19,13 +20,13 @@ async def get_book_publishers(product_id: UUID | str, session: sessionDepends):
 
 
 @router.post("/")
-async def add_publisher_to_book(bookpublisher: ProductPublishers, session: sessionDepends):
+async def add_publisher_to_book(bookpublisher: ProductPublisherCreate, session: sessionDepends):
     try:
         book_uuid = to_uuid(bookpublisher.product_id)
         publisher_uuid = to_uuid(bookpublisher.publisher_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid UUID format")
-    bookpublishers = await bookpublisher_service.add_publisher_to_book(book_uuid, publisher_uuid, session)
+    bookpublishers = await bookpublisher_service.add_publisher_to_book(bookpublisher, session)
     if not bookpublishers:
         raise HTTPException(status_code=404, detail="Publisher not found")
     return bookpublishers
@@ -40,8 +41,24 @@ async def remove_publisher_from_book(product_id: UUID | str, publisher_id: UUID 
         raise HTTPException(status_code=400, detail="Invalid UUID format")
     bookpublishers = await bookpublisher_service.remove_publisher_from_book(book_uuid, publisher_uuid, session)
     if  bookpublishers is None:
-        raise HTTPException(status_code=404, detail="role not found")
+        raise HTTPException(status_code=404, detail="publishers not found")
     return {
         "status": "success",
         "publishers": bookpublishers  # có thể rỗng []
     }
+    
+@router.put("/")
+async def update_book_publisher(
+    bookpublisher: ProductPublisherCreate,
+    session: sessionDepends
+):
+    try:
+        book_uuid = to_uuid(bookpublisher.product_id)
+        publisher_uuid = to_uuid(bookpublisher.publisher_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid UUID format")
+    bookpublishers = await bookpublisher_service.update_book_publisher( bookpublisher, session)
+    if not bookpublishers:
+        raise HTTPException(status_code=404, detail="Relation not found")
+    
+    return bookpublishers

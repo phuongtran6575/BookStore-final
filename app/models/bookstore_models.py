@@ -91,7 +91,7 @@ class Products(SQLModel, table=True):
     title: str
     description: Optional[str] = None
     sku: str = Field(unique=True, index=True)
-    ISBN: str = Field(unique=True, index=True)
+    size: Optional[str] = Field(default= None)
     price: float
     sale_price: Optional[float] = None
     stock_quantity: int = Field(default=0)
@@ -127,8 +127,8 @@ class ProductPublishers(SQLModel, table=True):
     year: Optional[int] = None
     isbn: Optional[str] = None
 
-    product: Optional[Products] = Relationship(back_populates="publishers")
-    publisher: Optional[Publishers] = Relationship(back_populates="products")
+    product: Products = Relationship(back_populates="publishers")
+    publisher: Publishers = Relationship(back_populates="products")
 
 
 class ProductCategories(SQLModel, table=True):

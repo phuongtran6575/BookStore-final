@@ -17,3 +17,11 @@ class PublisherUpdate(BaseModel):
 
 class PublisherRead(PublisherBase):
     id: UUID
+    
+class ProductPublisherCreate(BaseModel):
+    product_id: UUID
+    publisher_id: UUID
+    edition: Optional[str] = None
+    year: Optional[int] = None
+    isbn: Optional[str] = None
+
