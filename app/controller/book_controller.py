@@ -15,9 +15,15 @@ router = APIRouter(prefix="/books", tags=["Books"])
 
 # ================= GET ALL =================
 @router.get("/")
-async def get_all_books(session: sessionDepends,page: int = Query(1, ge=1),page_size: int = Query(12, ge=1, le=50)):
-    books = await book_service.get_all_books(session, page, page_size)
+async def get_all_books(session: sessionDepends,
+                        page: int = Query(1, ge=1),
+                        page_size: int = Query(12, ge=1, le=50),
+                        author_ids: list[UUID] = Query(default=[]),
+                        publisher_ids: list[UUID] = Query(default=[]),
+                        category_ids: list[UUID] = Query(default=[]),):
+    books = await book_service.get_all_books(session, page, page_size, author_ids, publisher_ids, category_ids)
     return books
+
 
 
 # ================= GET ONE =================
@@ -65,7 +71,4 @@ async def delete_book(book_id: UUID | str, session: sessionDepends):
         raise HTTPException(status_code=404, detail="Book not found")
     return {"status": "delete successful", "book_id": str(book_id)}
 
-@router.get("/")
-async def filter_book(session: sessionDepends, author_ids: list[UUID], publisher_ids: list[UUID], category_ids: list[UUID]):
-    books = await book_service.filter_book(session, author_ids, publisher_ids, category_ids)
-    return books
+
