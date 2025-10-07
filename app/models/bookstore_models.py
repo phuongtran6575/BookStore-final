@@ -3,6 +3,8 @@ from typing import Optional, List
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Relationship
 
+from schema.order_schema import OrderStatus, PaymentMethod, ShippingMethod
+
 
 # =========================
 # USERS & ROLES
@@ -195,9 +197,9 @@ class Orders(SQLModel, table=True):
     customer_phone: str
     shipping_address: str
     total_amount: float
-    status: str = Field(default="pending")
-    payment_method: str
-    shipping_method: str
+    status: OrderStatus = Field(default=OrderStatus.PENDING)  # ✅ Enum
+    payment_method: PaymentMethod
+    shipping_method: ShippingMethod
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     user: Optional[Users] = Relationship(back_populates="orders")
@@ -209,6 +211,7 @@ class OrderItems(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     order_id: UUID = Field(foreign_key="orders.id", ondelete="CASCADE")
     product_id: UUID = Field(foreign_key="products.id", ondelete="CASCADE")
+    image_url: str
     quantity: int
     price: float  # snapshot price
     subtotal: float
