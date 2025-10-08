@@ -3,7 +3,7 @@ from typing import Optional, List
 from uuid import UUID, uuid4
 from sqlmodel import SQLModel, Field, Relationship
 
-from schema.order_schema import OrderStatus, PaymentMethod, ShippingMethod
+from schema.order_schema import OrderStatus, PaymentMethod, PaymentStatus, ShippingMethod
 
 
 # =========================
@@ -196,6 +196,7 @@ class Orders(SQLModel, table=True):
     customer_email: str
     customer_phone: str
     shipping_address: str
+    stripe_session_id: str | None = None
     total_amount: float
     status: OrderStatus = Field(default=OrderStatus.PENDING)  # ✅ Enum
     payment_method: PaymentMethod
@@ -225,8 +226,8 @@ class Payments(SQLModel, table=True):
     order_id: UUID = Field(foreign_key="orders.id", ondelete="CASCADE")
     transaction_id: Optional[str] = None
     amount: float
-    status: str  # pending, paid, failed, refunded
-    method: str
+    status: PaymentStatus = Field(default=PaymentStatus.PENDING)
+    method: PaymentMethod  # dùng cùng Enum với Orders
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     order: Optional[Orders] = Relationship(back_populates="payments")

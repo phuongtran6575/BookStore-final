@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from controller.auth_controller import router as auth_router
 from controller.book_controller import router as book_router
@@ -15,8 +17,10 @@ from controller.booktag_controller import router as booktag_router
 from controller.useraddress_controller import router as useraddress_router
 from controller.bookimage_controller import router as bookimage_router
 from controller.order_controller import router as order_router
+from controller.paymentonline_controller import router as payment_router
 
 from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
@@ -52,3 +56,4 @@ app.include_router(useraddress_router)
 app.include_router(tag_router)
 app.include_router(bookimage_router)
 app.include_router(order_router)
+app.include_router(payment_router)

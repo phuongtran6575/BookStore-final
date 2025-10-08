@@ -6,7 +6,12 @@ from services import order_service
 from database.sqlite_database import sessionDepends
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
-
+@router.get("/orders/checkout-success")
+async def get_order_by_session_id(session: sessionDepends, session_id: str):
+    order = await order_service.get_order_by_session_id(session_id, session)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return await order_service.get_order_by_session_id(session_id, session)
 
 @router.get("/")
 async def get_list_orders(session: sessionDepends):
@@ -41,9 +46,7 @@ async def add_items_to_order(session: sessionDepends, orderitem: OrderItemCreate
     items = await order_service.add_items_to_order(session, orderitem)
     return items
 
-@router.post("/payments")
-async def create_payments(session: sessionDepends, payment: PaymentCreate, order_id, UUID):
-    return await order_service.create_payments(session, payment, order_id)
+
 
 
 

@@ -6,18 +6,27 @@ from pydantic import BaseModel
 
 from enum import Enum
 
+class PaymentStatus(str, Enum):
+    PENDING = "pending"     # Đang chờ xử lý
+    PAID = "paid"           # Thanh toán thành công
+    FAILED = "failed"       # Thanh toán thất bại
+    REFUNDED = "refunded"   # Đã hoàn tiền
+
+
 class OrderStatus(str, Enum):
-    PENDING = "pending"           # mới tạo, chưa xử lý
-    PROCESSING = "processing"     # đang chuẩn bị hàng
-    SHIPPED = "shipped"           # đã giao cho đơn vị vận chuyển
-    DELIVERED = "delivered"       # đã giao thành công
-    CANCELLED = "cancelled"       # đã hủy
+    PENDING = "pending"         # Vừa tạo, chưa thanh toán
+    PAID = "paid"               # Đã thanh toán (hoặc COD xác nhận)
+    PROCESSING = "processing"   # Đang chuẩn bị hàng
+    SHIPPED = "shipped"         # Đã giao cho đơn vị vận chuyển
+    DELIVERED = "delivered"     # Đã giao thành công
+    CANCELLED = "cancelled"     # Đã hủy
+
 
 class PaymentMethod(str, Enum):
     STRIPE = "STRIPE"
     COD = "COD"
     BANK = "BANK"
-    MOMO = "MOMO"  # nếu bạn có tích hợp
+    MOMO = "MOMO"
     VNPAY = "VNPAY"
 
 

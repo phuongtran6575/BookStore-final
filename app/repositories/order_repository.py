@@ -3,16 +3,56 @@ from uuid import UUID
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
-from schema.order_schema import OrderCreate, OrderItemCreate, OrderItemRead, OrderRead, PaymentCreate
+from schema.order_schema import OrderCreate, OrderItemCreate, OrderItemRead, OrderRead, OrderStatus, PaymentCreate, PaymentMethod, PaymentStatus
 from models.bookstore_models import OrderItems, Orders, Payments
 
 
 async def create_order(session: Session, order: OrderCreate):
-    order_data = Orders(**order.model_dump())
-    session.add(order_data)
-    session.commit()
-    session.refresh(order_data)
-    return order
+    try:
+        # 1️⃣ Tạo đơn hàng
+        order_data = Orders(**order.model_dump())
+
+        # ✅ Set trạng thái ban đầu theo phương thức thanh toán
+        if order.payment_method == PaymentMethod.COD:
+            order_data.status = OrderStatus.PROCESSING  # COD => chuẩn bị giao luôn
+        else:
+            order_data.status = OrderStatus.PENDING  # Stripe, MoMo, v.v. => chờ thanh toán
+
+        session.add(order_data)
+        session.commit()
+        session.refresh(order_data)
+
+        # 2️⃣ Tạo bản ghi thanh toán
+        payment = Payments(
+            order_id=order_data.id,
+            amount=order_data.total_amount,
+            method=PaymentMethod(order.payment_method),
+            status=PaymentStatus.PENDING
+        )
+        session.add(payment)
+        session.commit()
+        session.refresh(payment)
+
+        # 3️⃣ Nếu là Stripe, trả về link thanh toán
+        if order.payment_method == PaymentMethod.STRIPE:
+            return {
+                "order_id": str(order_data.id),
+                "payment_method": order.payment_method,
+                "status": order_data.status,
+                "redirect_to": "/payment/stripe"
+            }
+
+        # 4️⃣ Nếu là COD → trả kết quả ngay, không cần redirect Stripe
+        return {
+            "order_id": str(order_data.id),
+            "payment_method": order.payment_method,
+            "status": order_data.status
+        }
+
+    except Exception as e:
+        session.rollback()
+        raise ValueError("Not Found")
+
 
 from sqlmodel import Session, select
 from uuid import UUID
@@ -73,8 +113,8 @@ async def create_payment(session: Session, payment: PaymentCreate, order_id: UUI
     db_payment = Payments(
         order_id=order_id,
         amount=payment.amount,
-        method=payment.method,
-        status="pending"
+        method=PaymentMethod(payment.method),
+        status=PaymentStatus("pending")
     )
     session.add(db_payment)
     session.commit()
